@@ -1,694 +1,526 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SmartHome Hub – Fabio</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-<style>
-  :root {
-    --bg: #121417;
-    --bg-alt: #1e222a;
-    --card-bg: #252a38;
-    --txt-primary: #e8ecf1;
-    --txt-secondary: #8a94a7;
-    --accent: #6ae3ff;
-    --accent2: #7bffb7;
-    --border: #303752;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --red: #ff6b6b;
-    --green: #38d39f;
-    --amber: #ffc857;
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmartHome Hub – UI Rinnovata</title>
+  <!-- Font & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-elev: #111824;
+      --card: #121b2a;
+      --muted: #8fa1b6;
+      --text: #e9f0f7;
+      --border: #1e2a3c;
+      --accent: #6ae3ff;
+      --accent-2: #7bffb7;
+      --danger: #ff6b6b;
+      --warning: #ffc857;
+      --success: #38d39f;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius-lg: 26px;
+      --trans: .22s cubic-bezier(.2,.6,.2,1);
+    }
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color: var(--text);
+      background: radial-gradient(1200px 700px at 70% -10%, #162136 0%, transparent 60%) , var(--bg);
+    }
 
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background: var(--bg);
-    color: var(--txt-primary);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  header {
-    background: var(--bg-alt);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    font-weight: 700;
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .logo .pill {
-    background: var(--accent);
-    color: var(--bg);
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: 700;
-  }
-  nav {
-    margin-left: auto;
-    display: flex;
-    gap: 16px;
-  }
-  nav button {
-    background: transparent;
-    border: none;
-    color: var(--txt-secondary);
-    font-weight: 500;
-    font-size: 1rem;
-    padding: 8px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  nav button.active,
-  nav button:hover {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: var(--bg);
-  }
-  main {
-    flex-grow: 1;
-    max-width: 1100px;
-    margin: 24px auto;
-    padding: 0 16px 50px;
-    width: 100%;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    gap: 20px;
-  }
-  .card {
-    background: var(--card-bg);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .card > h3 {
-    margin: 0;
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border);
-    font-weight: 700;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .card > h3 .material-icons {
-    color: var(--accent);
-    font-size: 24px;
-  }
-  .content {
-    padding: 16px 24px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .row {
-    background: var(--bg-alt);
-    padding: 12px 16px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
-    border: 1px solid var(--border);
-  }
-  .row:hover {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: var(--bg);
-  }
-  .row .meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.9rem;
-  }
-  .toggle {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 48px;
-    height: 28px;
-    background: #394155;
-    border-radius: 999px;
-    position: relative;
-    cursor: pointer;
-    outline: none;
-    border: 1px solid var(--border);
-    transition: background-color 0.3s ease;
-  }
-  .toggle:checked {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-  }
-  .toggle:before {
-    content: "";
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: #fff;
-    transition: transform 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  .toggle:checked:before {
-    transform: translateX(20px);
-  }
-  .btn {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: 0;
-    color: var(--bg);
-    font-weight: 700;
-    padding: 10px 16px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .btn:hover {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-  }
-  .pill {
-    font-size: 12px;
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    border-radius: 999px;
-    color: var(--txt-secondary);
-    background: var(--bg-alt);
-    user-select: none;
-  }
-  .muted {
-    color: var(--txt-secondary);
-  }
-  .hint {
-    font-size: 13px;
-    color: var(--txt-secondary);
-  }
-  /* Floorplan */
-  .plan-wrap {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .canvas {
-    background: var(--bg-alt);
-    border: 2px dashed var(--border);
-    border-radius: 16px;
-    position: relative;
-    min-height: 320px;
-    max-width: 100%;
-    flex: 1 1 320px;
-    overflow: hidden;
-  }
-  .canvas img {
-    width: 100%;
-    height: auto;
-    display: block;
-    opacity: 0.95;
-    user-select: none;
-    pointer-events: none;
-  }
-  .pin {
-    position: absolute;
-    transform: translate(-50%, -100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: grab;
-    user-select: none;
-    transition: filter 0.3s ease, opacity 0.3s ease;
-  }
-  .pin i {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--amber), var(--accent));
-    box-shadow: 0 3px 14px rgba(0,0,0,0.5);
-    display: inline-block;
-  }
-  .pin label {
-    font-size: 13px;
-    background: var(--bg-alt);
-    border: 1px solid var(--border);
-    padding: 4px 8px;
-    border-radius: 8px;
-    white-space: nowrap;
-  }
-  .pin.off i {
-    filter: grayscale(1);
-    opacity: 0.5;
-  }
-  /* Responsive */
-  @media (max-width: 650px) {
-    nav {
-      gap: 8px;
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(1.2) blur(10px);
+      background: linear-gradient(180deg, rgba(17,24,36,.75), rgba(17,24,36,.55));
+      border-bottom: 1px solid var(--border);
     }
-    nav button {
-      font-size: 0.9rem;
-      padding: 6px 10px;
-    }
-    main {
-      margin: 16px 12px;
-      padding-bottom: 30px;
-    }
-  }
-</style>
+    .bar { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; }
+    .logo i { font-variation-settings: 'FILL' 1; font-size: 28px; color: var(--accent); }
+    .logo .badge { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #00161f; font-weight: 700; padding: 2px 10px; border-radius: 999px; font-size: 12px; }
+
+    /* Tabs */
+    .tabs { margin-left: auto; display: flex; gap: 6px; background: var(--bg-elev); padding: 6px; border-radius: 999px; border: 1px solid var(--border); }
+    .tab { border: 0; background: transparent; color: var(--muted); font-weight: 600; padding: 10px 14px; border-radius: 999px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--trans); }
+    .tab i { font-size: 20px; }
+    .tab:hover { color: var(--text); }
+    .tab.active { background: linear-gradient(135deg, rgba(106,227,255,.18), rgba(123,255,183,.18)); color: var(--text); box-shadow: inset 0 0 0 1px rgba(122,223,210,.3); }
+
+    main { max-width: 1100px; margin: 22px auto 40px; padding: 0 16px; }
+
+    /* Cards & layout */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+    .card { background: linear-gradient(180deg, rgba(18,27,42,1), rgba(18,27,42,.9)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .card h3 { margin: 0; padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 1.05rem; }
+    .card h3 i { color: var(--accent); font-size: 22px; }
+    .content { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+
+    .muted { color: var(--muted); }
+    .pill { font-size: 12px; border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.03); }
+
+    /* Buttons */
+    .btn { border: 0; cursor: pointer; font-weight: 700; padding: 10px 14px; border-radius: 12px; transition: var(--trans); display: inline-flex; align-items: center; gap: 8px; }
+    .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #04131b; }
+    .btn.primary:hover { transform: translateY(-1px); filter: saturate(1.1); }
+    .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn.ghost:hover { background: rgba(255,255,255,.05); }
+    .btn.icon { padding: 8px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid var(--border); }
+
+    /* Toggles */
+    .toggle { appearance: none; width: 48px; height: 28px; border-radius: 999px; background: #2a3951; position: relative; border: 1px solid var(--border); transition: var(--trans); cursor: pointer; }
+    .toggle:before { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 5px 18px rgba(0,0,0,.25); transition: var(--trans); }
+    .toggle:checked { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+    .toggle:checked:before { transform: translateX(20px); }
+
+    /* Lists */
+    .list { display: flex; flex-direction: column; gap: 12px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; transition: var(--trans); }
+    .row:hover { background: rgba(255,255,255,.05); }
+    .row .meta { display: flex; align-items: center; gap: 10px; }
+    .row .actions { display: flex; gap: 8px; }
+
+    /* Inputs */
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label { font-size: 13px; color: var(--muted); }
+    .input, select, textarea { background: rgba(255,255,255,.04); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; outline: none; transition: var(--trans); }
+    .input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 2px rgba(106,227,255,.25); }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.45); z-index: 100; }
+    .modal { width: min(520px, 92vw); background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+    .modal .head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .modal .body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+    .modal .foot { padding: 16px 18px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* Floorplan */
+    .plan-wrap { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .canvas { position: relative; min-height: 320px; background: #0e141e; border: 2px dashed var(--border); border-radius: var(--radius); overflow: hidden; }
+    .canvas img { width: 100%; height: auto; display: block; opacity: .95; pointer-events: none; user-select: none; }
+    .pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: grab; user-select: none; }
+    .pin i { width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, var(--warning), var(--accent)); box-shadow: 0 6px 22px rgba(0,0,0,.45); display: inline-block; }
+    .pin label { font-size: 12px; background: rgba(0,0,0,.45); border: 1px solid var(--border); padding: 4px 8px; border-radius: 8px; white-space: nowrap; }
+    .pin.off i { filter: grayscale(1); opacity: .55; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0f1724; border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 12px; opacity: 0; transition: var(--trans); z-index: 90; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Light theme */
+    .light { --bg: #f6f8fb; --bg-elev:#ffffffd9; --card:#fff; --text:#0f172a; --muted:#586a85; --border:#e6eaf0; --shadow: 0 12px 28px rgba(16,24,40,.08); }
+
+    @media (max-width: 680px){ .logo span.title { display:none } }
+  </style>
 </head>
 <body>
-<header>
-  <div class="logo">
-    <span class="material-icons" style="font-size:28px;color:var(--accent)">home</span>
-    SmartHome Hub <span class="pill">MVP</span>
+  <header>
+    <div class="bar">
+      <div class="logo">
+        <i class="material-symbols-rounded">home</i>
+        <span class="title">SmartHome Hub</span>
+        <span class="badge">RINNOVATO</span>
+      </div>
+      <div class="tabs" id="tabs"></div>
+    </div>
+  </header>
+
+  <main id="view"></main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Salvato</div>
+
+  <!-- Modal generic -->
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="head">
+        <strong id="modalTitle">Titolo</strong>
+        <button class="btn icon" id="modalClose" aria-label="Chiudi"><i class="material-symbols-rounded">close</i></button>
+      </div>
+      <div class="body" id="modalBody"></div>
+      <div class="foot" id="modalFoot"></div>
+    </div>
   </div>
-  <nav id="nav"></nav>
-</header>
-<main id="view"></main>
 
-<script>
-/* ===========================
-   SmartHome Hub – MVP Frontend
-   State saved in localStorage
-   Devices, Rooms, Floorplan, Automations
-=========================== */
+  <script>
+  // ======= Utilities =======
+  const $ = (s, el=document) => el.querySelector(s);
+  const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+  const bus = new EventTarget();
+  const KEY = 'smarthub_v3';
 
-const TABS = [
-  {id:"dash", label:"Dashboard", icon:"dashboard"},
-  {id:"devices", label:"Dispositivi", icon:"devices"},
-  {id:"floor", label:"Planimetria", icon:"map"},
-  {id:"auto", label:"Automazioni", icon:"settings_remote"},
-  {id:"backup", label:"Backup", icon:"backup"},
-  {id:"settings", label:"Impostazioni", icon:"settings"},
-];
+  function uid(){ return Math.random().toString(36).slice(2, 9); }
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; } }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); toast('Salvato'); }
+  function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1200); }
 
-const $ = (sel, el=document) => el.querySelector(sel);
-const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
-const bus = new EventTarget();
+  const state = load() || {
+    devices: [], // {id,name,type,room,on,meta:{},x,y}
+    rooms: ['Ingresso','Salone','Cucina','Camera','Bagno'],
+    floorplan: { src: '', pins: {} },
+    automations: [], // {id,name,if:{deviceId,prop,op,value}, then:{deviceId,action}}
+    prefs: { theme: 'dark', units: 'metric' },
+    createdAt: Date.now()
+  };
 
-const state = load() || {
-  devices: [],        // {id,name,type,room,on,meta:{}, x,y}
-  rooms: ["Ingresso","Salone","Cucina","Camera","Bagno"],
-  floorplan: {src:"", pins:{}}, // pins by device id: {x,y}
-  automations: [],    // {id,name,if:{deviceId,prop,op,value}, then:{deviceId,action}}
-  prefs: {theme:"dark", units:"metric"},
-  createdAt: Date.now()
-};
+  // ======= Tabs =======
+  const TABS = [
+    { id:'dash', label:'Dashboard', icon:'dashboard' },
+    { id:'devices', label:'Dispositivi', icon:'devices' },
+    { id:'floor', label:'Planimetria', icon:'map' },
+    { id:'auto', label:'Automazioni', icon:'settings_remote' },
+    { id:'backup', label:'Backup', icon:'backup' },
+    { id:'settings', label:'Impostazioni', icon:'settings' },
+  ];
 
-function load(){ try { return JSON.parse(localStorage.getItem("fabio_hub_v2")); } catch(e){ return null; } }
-function save(){ localStorage.setItem("fabio_hub_v2", JSON.stringify(state)); }
-
-function uid(){ return Math.random().toString(36).slice(2,9); }
-function setTab(id){ location.hash = id; render(); }
-function activeTab(){ return location.hash?.slice(1) || "dash"; }
-
-function renderNav(){
-  const nav = $("#nav");
-  nav.innerHTML = "";
-  TABS.forEach(t=>{
-    const b=document.createElement("button");
-    b.title = t.label;
-    b.innerHTML = `<span class="material-icons">${t.icon}</span> ${t.label}`;
-    b.className = activeTab()===t.id ? "active" : "";
-    b.onclick = () => setTab(t.id);
-    nav.appendChild(b);
-  });
-}
-
-/* ------- VIEWS -------- */
-function render(){
-  renderNav();
-  const v = $("#view");
-  const tab = activeTab();
-
-  if(tab==="dash") renderDashboard(v);
-  else if(tab==="devices") renderDevices(v);
-  else if(tab==="floor") renderFloorplan(v);
-  else if(tab==="auto") renderAutomations(v);
-  else if(tab==="backup") renderBackup(v);
-  else if(tab==="settings") renderSettings(v);
-  else v.textContent = "Tab non trovata";
-}
-
-/* ----- Dashboard ----- */
-function renderDashboard(v){
-  v.innerHTML = "";
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3><span class="material-icons">dashboard</span> Dashboard</h3>`;
-  const content = document.createElement("div");
-  content.className = "content";
-
-  // Mostra numero dispositivi e stanze
-  content.innerHTML = `
-    <p>Dispositivi totali: <strong>${state.devices.length}</strong></p>
-    <p>Stanze configurate: <strong>${state.rooms.length}</strong></p>
-    <p>Automazioni attive: <strong>${state.automations.length}</strong></p>
-    <p>Ultimo backup: <strong>${localStorage.getItem('fabio_hub_backup_date') || 'Mai'}</strong></p>
-  `;
-
-  card.appendChild(content);
-  v.appendChild(card);
-}
-
-/* ----- Devices ----- */
-function renderDevices(v){
-  v.innerHTML = "";
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3><span class="material-icons">devices</span> Dispositivi</h3>`;
-
-  const content = document.createElement("div");
-  content.className = "content";
-
-  if(state.devices.length === 0){
-    content.innerHTML = `<p class="muted">Nessun dispositivo aggiunto. Aggiungine uno nuovo!</p>`;
-  } else {
-    const list = document.createElement("div");
-    list.className = "list";
-
-    state.devices.forEach(d=>{
-      const row = document.createElement("div");
-      row.className = "row";
-      const isOn = d.on ? "checked" : "";
-      row.innerHTML = `
-        <div>
-          <strong>${d.name}</strong> <span class="pill">${d.type}</span> <span class="muted">(${d.room || "Nessuna stanza"})</span>
-        </div>
-        <input type="checkbox" class="toggle" data-id="${d.id}" ${isOn} aria-label="Accendi o spegni dispositivo" />
-      `;
-      list.appendChild(row);
+  function setTab(id){ location.hash = id; render(); }
+  function activeTab(){ return location.hash?.slice(1) || 'dash'; }
+  function renderTabs(){
+    const wrap = $('#tabs');
+    wrap.innerHTML = '';
+    TABS.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'tab' + (activeTab()===t.id ? ' active' : '');
+      b.innerHTML = `<i class="material-symbols-rounded">${t.icon}</i><span>${t.label}</span>`;
+      b.onclick = () => setTab(t.id);
+      wrap.appendChild(b);
     });
-    content.appendChild(list);
   }
 
-  // Aggiungi bottone aggiunta dispositivo
-  const addBtn = document.createElement("button");
-  addBtn.className = "btn";
-  addBtn.textContent = "Aggiungi dispositivo";
-  addBtn.onclick = () => addDevice();
-  content.appendChild(addBtn);
+  // ======= Modal =======
+  function openModal(title, bodyEl, footEls=[]) {
+    $('#modalTitle').textContent = title;
+    const body = $('#modalBody'); body.innerHTML = ''; body.appendChild(bodyEl);
+    const foot = $('#modalFoot'); foot.innerHTML = ''; footEls.forEach(el=>foot.appendChild(el));
+    const bd = $('#modalBackdrop'); bd.style.display = 'flex'; bd.setAttribute('aria-hidden','false');
+  }
+  function closeModal(){ const bd = $('#modalBackdrop'); bd.style.display='none'; bd.setAttribute('aria-hidden','true'); }
+  $('#modalClose').onclick = closeModal; $('#modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
 
-  card.appendChild(content);
-  v.appendChild(card);
-
-  // Eventi toggle
-  $$(".toggle").forEach(toggle=>{
-    toggle.onchange = e => {
-      const id = e.target.dataset.id;
-      const device = state.devices.find(d=>d.id===id);
-      if(device){
-        device.on = e.target.checked;
-        save();
-        bus.dispatchEvent(new CustomEvent("device-toggled", {detail: device}));
-      }
-    }
-  });
-}
-
-function addDevice(){
-  const name = prompt("Nome dispositivo:");
-  if(!name) return alert("Nome obbligatorio");
-  const type = prompt("Tipo dispositivo (es. lampada, sensore):") || "generico";
-  const room = prompt(`Stanza (scegli tra: ${state.rooms.join(", ")}):`) || "";
-  const newDevice = {id: uid(), name, type, room, on:false, meta:{}, x:50, y:50};
-  state.devices.push(newDevice);
-  save();
-  render();
-}
-
-/* ----- Floorplan ----- */
-function renderFloorplan(v){
-  v.innerHTML = "";
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3><span class="material-icons">map</span> Planimetria</h3>`;
-
-  const content = document.createElement("div");
-  content.className = "content";
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "plan-wrap";
-
-  // Immagine planimetria con pins
-  const canvas = document.createElement("div");
-  canvas.className = "canvas";
-
-  if(state.floorplan.src){
-    const img = document.createElement("img");
-    img.src = state.floorplan.src;
-    canvas.appendChild(img);
-  } else {
-    canvas.innerHTML = `<p class="muted" style="padding:16px;">Nessuna planimetria caricata.</p>`;
+  // ======= Views =======
+  function render(){
+    renderTabs();
+    const v = $('#view');
+    const tab = activeTab();
+    if(tab==='dash') renderDashboard(v);
+    else if(tab==='devices') renderDevices(v);
+    else if(tab==='floor') renderFloorplan(v);
+    else if(tab==='auto') renderAutomations(v);
+    else if(tab==='backup') renderBackup(v);
+    else if(tab==='settings') renderSettings(v);
   }
 
-  // Pins dispositivi posizionati
-  state.devices.forEach(d=>{
-    if(d.x !== undefined && d.y !== undefined && state.floorplan.src){
-      const pin = document.createElement("div");
-      pin.className = "pin" + (d.on ? "" : " off");
-      pin.style.left = d.x + "%";
-      pin.style.top = d.y + "%";
-      pin.title = d.name;
-      pin.innerHTML = `<i class="material-icons">place</i><label>${d.name}</label>`;
+  // --- Dashboard ---
+  function renderDashboard(v){
+    v.innerHTML = '';
+    const g = document.createElement('div'); g.className = 'grid';
 
-      // Drag & drop semplice
-      pin.onpointerdown = e => {
-        e.preventDefault();
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const rect = canvas.getBoundingClientRect();
-        function onMove(ev){
-          let dx = ev.clientX - startX;
-          let dy = ev.clientY - startY;
-          let newX = ((pin.offsetLeft + dx) / rect.width) * 100;
-          let newY = ((pin.offsetTop + dy) / rect.height) * 100;
-          newX = Math.min(100, Math.max(0, newX));
-          newY = Math.min(100, Math.max(0, newY));
-          pin.style.left = newX + "%";
-          pin.style.top = newY + "%";
-        }
-        function onUp(ev){
-          document.removeEventListener("pointermove", onMove);
-          document.removeEventListener("pointerup", onUp);
-          // Salvo posizione in device
-          d.x = parseFloat(pin.style.left);
-          d.y = parseFloat(pin.style.top);
-          save();
-        }
-        document.addEventListener("pointermove", onMove);
-        document.addEventListener("pointerup", onUp);
-      }
+    // Summary card
+    const c1 = card('dashboard', 'Dashboard');
+    const ct1 = c1.querySelector('.content');
+    ct1.innerHTML = `
+      <div class="list">
+        <div class="row"><div class="meta"><i class="material-symbols-rounded">memory</i><div>Dispositivi</div></div><strong>${state.devices.length}</strong></div>
+        <div class="row"><div class="meta"><i class="material-symbols-rounded">meeting_room</i><div>Stanze</div></div><strong>${state.rooms.length}</strong></div>
+        <div class="row"><div class="meta"><i class="material-symbols-rounded">auto_awesome_motion</i><div>Automazioni</div></div><strong>${state.automations.length}</strong></div>
+        <div class="row"><div class="meta"><i class="material-symbols-rounded">cloud_done</i><div>Ultimo backup</div></div><strong>${localStorage.getItem('sh_last_backup') || 'Mai'}</strong></div>
+      </div>`;
 
-      canvas.appendChild(pin);
+    // Quick actions
+    const c2 = card('bolt', 'Azioni rapide');
+    const ct2 = c2.querySelector('.content');
+    const a1 = btn('Aggiungi dispositivo','add'); a1.onclick = () => openAddDevice();
+    const a2 = btn('Aggiungi automazione','add_task'); a2.onclick = () => openAddAutomation();
+    const a3 = btn('Carica planimetria','upload'); a3.onclick = () => setTab('floor');
+    ct2.append(a1,a2,a3);
+
+    g.append(c1,c2);
+    v.appendChild(g);
+  }
+
+  // --- Devices ---
+  function renderDevices(v){
+    v.innerHTML = '';
+    const c = card('devices','Dispositivi');
+    const ct = c.querySelector('.content');
+
+    if(state.devices.length===0){
+      const p = document.createElement('p'); p.className='muted'; p.textContent='Nessun dispositivo. Aggiungine uno con il pulsante qui sotto.'; ct.appendChild(p);
+    } else {
+      const list = document.createElement('div'); list.className='list';
+      state.devices.forEach(d=>{
+        const row = document.createElement('div'); row.className='row';
+        const meta = document.createElement('div'); meta.className='meta';
+        const icon = document.createElement('i'); icon.className='material-symbols-rounded'; icon.textContent = pickIcon(d.type);
+        const title = document.createElement('div'); title.innerHTML = `<strong>${escapeHTML(d.name)}</strong> <span class="pill">${escapeHTML(d.type)}</span> <span class="muted">${d.room||'—'}</span>`;
+        meta.append(icon,title);
+        const actions = document.createElement('div'); actions.className='actions';
+        const tgl = document.createElement('input'); tgl.type='checkbox'; tgl.className='toggle'; tgl.checked = !!d.on; tgl.onchange = ()=>{ d.on = tgl.checked; save(); updatePins(); };
+        const editB = iconBtn('edit'); editB.title='Modifica'; editB.onclick=()=> openEditDevice(d);
+        const delB = iconBtn('delete'); delB.title='Elimina'; delB.onclick=()=> deleteDevice(d.id);
+        actions.append(tgl, editB, delB);
+        row.append(meta, actions); list.appendChild(row);
+      });
+      ct.appendChild(list);
     }
-  });
 
-  wrapper.appendChild(canvas);
+    const add = btn('Aggiungi dispositivo','add'); add.onclick = ()=> openAddDevice();
+    ct.appendChild(add);
+    $('#view').appendChild(c);
+  }
 
-  // Upload planimetria
-  const inputFile = document.createElement("input");
-  inputFile.type = "file";
-  inputFile.accept = "image/*";
-  inputFile.style.marginTop = "16px";
-  inputFile.onchange = e => {
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      state.floorplan.src = ev.target.result;
-      save();
-      render();
+  function openAddDevice(){
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="field"><label>Nome</label><input class="input" id="d_name" placeholder="Lampada Salone" /></div>
+      <div class="field"><label>Tipo</label><input class="input" id="d_type" placeholder="lampada, sensore…" /></div>
+      <div class="field"><label>Stanza</label>${roomSelect('d_room')}</div>
+    `;
+    const cancel = ghostBtn('Annulla'); cancel.onclick = closeModal;
+    const ok = primaryBtn('Aggiungi'); ok.onclick = ()=>{
+      const name = $('#d_name').value.trim(); if(!name) return toast('Inserisci un nome');
+      const type = $('#d_type').value.trim() || 'generico';
+      const room = $('#d_room').value;
+      state.devices.push({ id: uid(), name, type, room, on:false, meta:{}, x:50, y:50 });
+      save(); closeModal(); render();
     };
-    reader.readAsDataURL(file);
-  };
-  content.appendChild(wrapper);
-  content.appendChild(inputFile);
+    openModal('Nuovo dispositivo', wrap, [cancel, ok]);
+  }
 
-  card.appendChild(content);
-  v.appendChild(card);
-}
+  function openEditDevice(d){
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="field"><label>Nome</label><input class="input" id="e_name" value="${escapeHTML(d.name)}" /></div>
+      <div class="field"><label>Tipo</label><input class="input" id="e_type" value="${escapeHTML(d.type)}" /></div>
+      <div class="field"><label>Stanza</label>${roomSelect('e_room', d.room)}</div>
+    `;
+    const del = ghostBtn('Elimina'); del.onclick = ()=>{ deleteDevice(d.id); closeModal(); };
+    const cancel = ghostBtn('Annulla'); cancel.onclick = closeModal;
+    const ok = primaryBtn('Salva'); ok.onclick = ()=>{
+      d.name = $('#e_name').value.trim() || d.name;
+      d.type = $('#e_type').value.trim() || d.type;
+      d.room = $('#e_room').value;
+      save(); closeModal(); render(); updatePins();
+    };
+    openModal('Modifica dispositivo', wrap, [del, cancel, ok]);
+  }
 
-/* ----- Automations ----- */
-function renderAutomations(v){
-  v.innerHTML = "";
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3><span class="material-icons">settings_remote</span> Automazioni</h3>`;
-  const content = document.createElement("div");
-  content.className = "content";
+  function deleteDevice(id){
+    if(!confirm('Eliminare il dispositivo?')) return;
+    const i = state.devices.findIndex(x=>x.id===id);
+    if(i>-1) state.devices.splice(i,1);
+    save(); render(); updatePins();
+  }
 
-  if(state.automations.length === 0){
-    content.innerHTML = `<p class="muted">Nessuna automazione configurata. Creane una nuova!</p>`;
-  } else {
-    const list = document.createElement("div");
-    list.className = "list";
-    state.automations.forEach(a=>{
-      const row = document.createElement("div");
-      row.className = "row";
-      row.textContent = `${a.name} - IF ${a.if.deviceId} ${a.if.prop} ${a.if.op} ${a.if.value} THEN ${a.then.deviceId} ${a.then.action}`;
-      list.appendChild(row);
+  // --- Floorplan ---
+  function renderFloorplan(v){
+    v.innerHTML = '';
+    const c = card('map','Planimetria');
+    const ct = c.querySelector('.content');
+
+    const wrapper = document.createElement('div'); wrapper.className='plan-wrap';
+    const canvas = document.createElement('div'); canvas.className='canvas'; canvas.id='canvas';
+
+    if(state.floorplan.src){
+      const img = document.createElement('img'); img.src = state.floorplan.src; canvas.appendChild(img);
+    } else {
+      const empty = document.createElement('div'); empty.className='muted'; empty.style.padding='12px'; empty.textContent='Nessuna planimetria caricata.'; canvas.appendChild(empty);
+    }
+
+    // Add pins
+    state.devices.forEach(d=>{
+      if(state.floorplan.src){
+        const pin = document.createElement('div'); pin.className = 'pin' + (d.on ? '' : ' off');
+        pin.style.left = (d.x ?? 50) + '%';
+        pin.style.top = (d.y ?? 50) + '%';
+        pin.innerHTML = `<i></i><label>${escapeHTML(d.name)}</label>`;
+        pin.title = d.name;
+
+        pin.onpointerdown = e => {
+          e.preventDefault();
+          const rect = canvas.getBoundingClientRect();
+          function move(ev){
+            const x = ((ev.clientX - rect.left) / rect.width) * 100;
+            const y = ((ev.clientY - rect.top) / rect.height) * 100;
+            pin.style.left = Math.min(100, Math.max(0, x)) + '%';
+            pin.style.top = Math.min(100, Math.max(0, y)) + '%';
+          }
+          function up(){
+            document.removeEventListener('pointermove', move);
+            document.removeEventListener('pointerup', up);
+            d.x = parseFloat(pin.style.left);
+            d.y = parseFloat(pin.style.top);
+            save();
+          }
+          document.addEventListener('pointermove', move);
+          document.addEventListener('pointerup', up);
+        };
+        canvas.appendChild(pin);
+      }
     });
-    content.appendChild(list);
+
+    wrapper.appendChild(canvas);
+
+    const up = document.createElement('input'); up.type='file'; up.accept='image/*';
+    up.onchange = e => {
+      const file = e.target.files[0]; if(!file) return;
+      const r = new FileReader(); r.onload = ev => { state.floorplan.src = ev.target.result; save(); render(); };
+      r.readAsDataURL(file);
+    };
+
+    ct.append(wrapper, up);
+    v.appendChild(c);
   }
 
-  const addBtn = document.createElement("button");
-  addBtn.className = "btn";
-  addBtn.textContent = "Aggiungi automazione";
-  addBtn.onclick = () => addAutomation();
-  content.appendChild(addBtn);
+  function updatePins(){ if(activeTab()==='floor') renderFloorplan($('#view')); }
 
-  card.appendChild(content);
-  v.appendChild(card);
-}
+  // --- Automations ---
+  function renderAutomations(v){
+    v.innerHTML = '';
+    const c = card('settings_remote','Automazioni');
+    const ct = c.querySelector('.content');
 
-function addAutomation(){
-  const name = prompt("Nome automazione:");
-  if(!name) return alert("Nome obbligatorio");
+    if(state.automations.length===0){
+      const p = document.createElement('p'); p.className='muted'; p.textContent='Nessuna automazione. Creane una con il pulsante qui sotto.'; ct.appendChild(p);
+    } else {
+      const list = document.createElement('div'); list.className='list';
+      state.automations.forEach(a=>{
+        const row = document.createElement('div'); row.className='row';
+        const di = state.devices.find(d=>d.id===a.if.deviceId); const dt = state.devices.find(d=>d.then.deviceId===d?.id);
+        row.innerHTML = `<div class="meta"><i class="material-symbols-rounded">auto_awesome_motion</i><div><strong>${escapeHTML(a.name)}</strong><div class="muted" style="font-size:12px">IF ${escapeHTML(di?.name||a.if.deviceId)} ${a.if.prop} ${a.if.op} ${a.if.value} → THEN ${escapeHTML((state.devices.find(d=>d.id===a.then.deviceId)?.name)||a.then.deviceId)} ${a.then.action}</div></div></div>`;
+        const actions = document.createElement('div'); actions.className='actions';
+        const del = iconBtn('delete'); del.title='Elimina'; del.onclick=()=>{ deleteAutomation(a.id); };
+        actions.append(del); row.appendChild(actions); list.appendChild(row);
+      });
+      ct.appendChild(list);
+    }
 
-  if(state.devices.length < 2) return alert("Aggiungi almeno due dispositivi prima!");
-
-  // Semplice creazione via prompt
-  const deviceIf = prompt("IF: id dispositivo trigger:");
-  const prop = prompt("Proprietà (es: on):");
-  const op = prompt("Operatore (es: ==):");
-  const value = prompt("Valore (es: true):");
-
-  const deviceThen = prompt("THEN: id dispositivo azione:");
-  const action = prompt("Azione (es: toggle):");
-
-  if(!deviceIf || !prop || !op || !deviceThen || !action) return alert("Dati incompleti");
-
-  const auto = {
-    id: uid(),
-    name,
-    if: {deviceId: deviceIf, prop, op, value},
-    then: {deviceId: deviceThen, action}
-  };
-  state.automations.push(auto);
-  save();
-  render();
-}
-
-/* ----- Backup ----- */
-function renderBackup(v){
-  v.innerHTML = "";
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3><span class="material-icons">backup</span> Backup</h3>`;
-  const content = document.createElement("div");
-  content.className = "content";
-
-  const dataStr = JSON.stringify(state, null, 2);
-  content.innerHTML = `
-    <p>Puoi scaricare il backup dei dati attuali in formato JSON.</p>
-    <textarea readonly style="width:100%;height:180px;background:#222;color:#eee;padding:12px;border-radius:8px;resize:none; font-family: monospace;">${dataStr}</textarea>
-  `;
-
-  const btnExport = document.createElement("button");
-  btnExport.className = "btn";
-  btnExport.textContent = "Scarica backup JSON";
-  btnExport.onclick = () => {
-    const blob = new Blob([dataStr], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `smarthome-backup-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    localStorage.setItem('fabio_hub_backup_date', new Date().toLocaleString());
-    render();
-  };
-
-  content.appendChild(btnExport);
-  card.appendChild(content);
-  v.appendChild(card);
-}
-
-/* ----- Settings ----- */
-function renderSettings(v){
-  v.innerHTML = "";
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3><span class="material-icons">settings</span> Impostazioni</h3>`;
-  const content = document.createElement("div");
-  content.className = "content";
-
-  content.innerHTML = `
-    <label>
-      Tema:
-      <select id="themeSelect">
-        <option value="dark" ${state.prefs.theme==="dark" ? "selected" : ""}>Scuro</option>
-        <option value="light" ${state.prefs.theme==="light" ? "selected" : ""}>Chiaro</option>
-      </select>
-    </label>
-  `;
-
-  const themeSelect = $("#themeSelect");
-  themeSelect.onchange = e => {
-    state.prefs.theme = e.target.value;
-    applyTheme();
-    save();
-  };
-
-  card.appendChild(content);
-  v.appendChild(card);
-}
-
-function applyTheme(){
-  if(state.prefs.theme === "light"){
-    document.documentElement.style.setProperty("--bg", "#f8f9fa");
-    document.documentElement.style.setProperty("--bg-alt", "#e9ecef");
-    document.documentElement.style.setProperty("--card-bg", "#ffffff");
-    document.documentElement.style.setProperty("--txt-primary", "#212529");
-    document.documentElement.style.setProperty("--txt-secondary", "#6c757d");
-    document.documentElement.style.setProperty("--border", "#dee2e6");
-    document.documentElement.style.setProperty("--shadow", "0 4px 12px rgba(0,0,0,0.1)");
-  } else {
-    document.documentElement.style.setProperty("--bg", "#121417");
-    document.documentElement.style.setProperty("--bg-alt", "#1e222a");
-    document.documentElement.style.setProperty("--card-bg", "#252a38");
-    document.documentElement.style.setProperty("--txt-primary", "#e8ecf1");
-    document.documentElement.style.setProperty("--txt-secondary", "#8a94a7");
-    document.documentElement.style.setProperty("--border", "#303752");
-    document.documentElement.style.setProperty("--shadow", "0 4px 12px rgba(0, 0, 0, 0.5)");
+    const add = btn('Aggiungi automazione','add_task'); add.onclick=()=> openAddAutomation();
+    ct.appendChild(add);
+    v.appendChild(c);
   }
-}
 
-window.addEventListener("hashchange", render);
+  function openAddAutomation(){
+    if(state.devices.length<1){ toast('Prima aggiungi almeno un dispositivo'); return; }
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="field"><label>Nome</label><input id="a_name" class="input" placeholder="Accendi luci ingresso al tramonto" /></div>
+      <div class="field"><label>Trigger – dispositivo</label>${deviceSelect('a_if_dev')}</div>
+      <div class="field"><label>Proprietà</label><input id="a_if_prop" class="input" placeholder="on" value="on" /></div>
+      <div class="field"><label>Operatore</label>
+        <select id="a_if_op">
+          <option value== selected>==</option>
+          <option value=!=>!=</option>
+        </select>
+      </div>
+      <div class="field"><label>Valore</label><input id="a_if_val" class="input" placeholder="true | false | 23…" value="true" /></div>
+      <hr style="border:none;border-top:1px solid var(--border)">
+      <div class="field"><label>Azione – dispositivo</label>${deviceSelect('a_then_dev')}</div>
+      <div class="field"><label>Azione</label><input id="a_then_act" class="input" placeholder="toggle | on | off" value="toggle" /></div>
+    `;
+    const cancel = ghostBtn('Annulla'); cancel.onclick=closeModal;
+    const ok = primaryBtn('Crea'); ok.onclick=()=>{
+      const name = $('#a_name').value.trim()||'Automazione';
+      const a = {
+        id: uid(),
+        name,
+        if: { deviceId: $('#a_if_dev').value, prop: $('#a_if_prop').value.trim()||'on', op: $('#a_if_op').value, value: $('#a_if_val').value.trim()||'true' },
+        then: { deviceId: $('#a_then_dev').value, action: $('#a_then_act').value.trim()||'toggle' }
+      };
+      state.automations.push(a); save(); closeModal(); render();
+    };
+    openModal('Nuova automazione', wrap, [cancel, ok]);
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-  applyTheme();
-  render();
-});
-</script>
+  function deleteAutomation(id){
+    if(!confirm('Eliminare l\'automazione?')) return;
+    const i = state.automations.findIndex(a=>a.id===id); if(i>-1) state.automations.splice(i,1);
+    save(); render();
+  }
+
+  // --- Backup ---
+  function renderBackup(v){
+    v.innerHTML = '';
+    const c = card('backup','Backup');
+    const ct = c.querySelector('.content');
+    const dataStr = JSON.stringify(state, null, 2);
+
+    const ta = document.createElement('textarea'); ta.readOnly=true; ta.style.width='100%'; ta.style.height='220px'; ta.className='input'; ta.value=dataStr;
+    const exp = btn('Scarica backup JSON','download'); exp.onclick=()=>{
+      const blob = new Blob([dataStr], {type:'application/json'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`smarthub-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); localStorage.setItem('sh_last_backup', new Date().toLocaleString()); render();
+    };
+
+    const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+    const imp = btn('Importa backup','upload'); imp.onclick=()=> inp.click();
+    inp.onchange = (e)=>{
+      const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ev => { try { Object.assign(state, JSON.parse(ev.target.result)); save(); render(); } catch(e){ toast('Backup non valido'); } } ; r.readAsText(f);
+    };
+
+    ct.append(ta, exp, imp, inp);
+    v.appendChild(c);
+  }
+
+  // --- Settings ---
+  function renderSettings(v){
+    v.innerHTML = '';
+    const c = card('settings','Impostazioni');
+    const ct = c.querySelector('.content');
+
+    const f = document.createElement('div'); f.className='field';
+    f.innerHTML = `<label>Tema</label><select id="themeSel"><option value="dark" ${state.prefs.theme==='dark'?'selected':''}>Scuro</option><option value="light" ${state.prefs.theme==='light'?'selected':''}>Chiaro</option></select>`;
+    ct.appendChild(f);
+
+    const btnRooms = ghostBtn('Modifica stanze'); btnRooms.onclick=()=> openRoomsEditor(); ct.appendChild(btnRooms);
+
+    const sel = f.querySelector('select'); sel.onchange = (e)=>{ state.prefs.theme = e.target.value; applyTheme(); save(); };
+    v.appendChild(c);
+  }
+
+  function openRoomsEditor(){
+    const wrap = document.createElement('div');
+    const list = document.createElement('div'); list.className='list';
+    state.rooms.forEach((r,idx)=>{
+      const row = document.createElement('div'); row.className='row';
+      row.innerHTML = `<div class="meta"><i class="material-symbols-rounded">meeting_room</i><strong>${escapeHTML(r)}</strong></div>`;
+      const actions = document.createElement('div'); actions.className='actions';
+      const del = iconBtn('delete'); del.onclick=()=>{ state.rooms.splice(idx,1); save(); openRoomsEditor(); };
+      actions.append(del); row.appendChild(actions); list.appendChild(row);
+    });
+    const addWrap = document.createElement('div'); addWrap.className='field'; addWrap.innerHTML = `<label>Nuova stanza</label><input id="room_new" class="input" placeholder="Studio" />`;
+    wrap.append(list, addWrap);
+
+    const cancel = ghostBtn('Chiudi'); cancel.onclick=closeModal;
+    const ok = primaryBtn('Salva'); ok.onclick=()=>{ const val=$('#room_new').value.trim(); if(val) state.rooms.push(val); save(); closeModal(); render(); };
+    openModal('Stanze', wrap, [cancel, ok]);
+  }
+
+  // ======= Helpers UI =======
+  function card(icon, title){
+    const c = document.createElement('section'); c.className='card';
+    c.innerHTML = `<h3><i class="material-symbols-rounded">${icon}</i> ${title}</h3><div class="content"></div>`;
+    return c;
+  }
+  function btn(label, icon){ const b=document.createElement('button'); b.className='btn primary'; b.innerHTML = `<i class="material-symbols-rounded">${icon}</i>${label}`; return b; }
+  function ghostBtn(label){ const b=document.createElement('button'); b.className='btn ghost'; b.textContent=label; return b; }
+  function iconBtn(icon){ const b=document.createElement('button'); b.className='btn icon'; b.innerHTML = `<i class="material-symbols-rounded">${icon}</i>`; return b; }
+  function deviceSelect(id){ const s=document.createElement('select'); s.id=id; state.devices.forEach(d=>{ const o=document.createElement('option'); o.value=d.id; o.textContent=d.name; s.appendChild(o); }); return s.outerHTML; }
+  function roomSelect(id, val=''){ const s=document.createElement('select'); s.id=id; const none=document.createElement('option'); none.value=''; none.textContent='—'; s.appendChild(none); state.rooms.forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; if(r===val) o.selected=true; s.appendChild(o); }); return s.outerHTML; }
+  function pickIcon(type){ type=(type||'').toLowerCase(); if(type.includes('lamp')) return 'lightbulb'; if(type.includes('sens')) return 'sensors'; if(type.includes('clima')||type.includes('termo')||type.includes('ac')) return 'device_thermostat'; if(type.includes('presa')||type.includes('plug')) return 'power'; if(type.includes('porta')||type.includes('finestra')) return 'door_sensor'; return 'memory'; }
+  function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+
+  // Theme
+  function applyTheme(){ document.body.classList.toggle('light', state.prefs.theme==='light'); }
+
+  window.addEventListener('hashchange', render);
+  document.addEventListener('DOMContentLoaded', ()=>{ applyTheme(); render(); });
+  </script>
 </body>
 </html>
