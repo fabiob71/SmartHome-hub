@@ -4,103 +4,327 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SmartHome Hub – Fabio</title>
-<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <style>
-  :root{
-    --bg:#0f1115; --panel:#161a22; --muted:#8a94a7; --txt:#e8ecf1;
-    --acc:#6ae3ff; --acc2:#7bffb7; --red:#ff6b6b; --amber:#ffc857;
-    --ok:#38d39f; --card:#1b2130; --border:#232a3a; --shadow:0 8px 28px rgba(0,0,0,.35)
+  :root {
+    --bg: #121417;
+    --bg-alt: #1e222a;
+    --card-bg: #252a38;
+    --txt-primary: #e8ecf1;
+    --txt-secondary: #8a94a7;
+    --accent: #6ae3ff;
+    --accent2: #7bffb7;
+    --border: #303752;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --red: #ff6b6b;
+    --green: #38d39f;
+    --amber: #ffc857;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,#0c0f14 0%,#0f1115 100%);color:var(--txt);font:15px/1.45 system-ui, -apple-system, Segoe UI, Roboto}
-  header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-  .bar{max-width:1100px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:700}
-  .logo i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:inline-block}
-  nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-  nav button{background:transparent;border:1px solid var(--border);color:var(--txt);padding:8px 10px;border-radius:10px;cursor:pointer}
-  nav button.active, nav button:hover{border-color:var(--acc);box-shadow:0 0 0 2px rgba(106,227,255,.15)}
-  main{max-width:1100px;margin:14px auto;padding:0 16px 50px}
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-  .card{grid-column:span 12;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
-  .card>h3{margin:0;padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-  .card>div.content{padding:14px 16px}
-  @media(min-width:900px){
-    .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}
+
+  * {
+    box-sizing: border-box;
   }
-  .muted{color:var(--muted)}
-  .pill{font-size:12px;border:1px solid var(--border);padding:4px 8px;border-radius:999px}
-  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:0;color:#0b0e13;font-weight:700;padding:10px 12px;border-radius:12px;cursor:pointer}
-  .btn.outline{background:transparent;border:1px solid var(--acc);color:var(--txt)}
-  .list{display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.02);padding:10px;border-radius:12px;border:1px solid var(--border)}
-  .row .meta{display:flex;align-items:center;gap:10px}
-  .toggle{appearance:none;width:48px;height:28px;background:#394155;border-radius:999px;position:relative;cursor:pointer;outline:none;border:1px solid var(--border)}
-  .toggle:checked{background:linear-gradient(135deg,var(--acc),var(--acc2))}
-  .toggle:before{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
-  .toggle:checked:before{transform:translateX(20px)}
-  .fld{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
-  .fld input,.fld select,.fld textarea{background:#11151f;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:10px;min-width:220px}
-  .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;background:#0b0e13;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
-  .hint{font-size:12px;color:var(--muted)}
-  /* floorplan */
-  .plan-wrap{display:grid;grid-template-columns:1fr 320px;gap:12px}
-  .canvas{background:#0b0e13;border:1px dashed #2a3246;border-radius:12px;position:relative;min-height:320px;overflow:hidden}
-  .canvas img{width:100%;height:auto;display:block;opacity:.95}
-  .pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:grab}
-  .pin i{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--acc));box-shadow:0 2px 10px rgba(0,0,0,.5)}
-  .pin label{font-size:12px;background:#0b0e13;border:1px solid var(--border);padding:3px 6px;border-radius:6px}
-  .pin.off i{filter:grayscale(1);opacity:.5}
-  /* tables */
-  table{width:100%;border-collapse:collapse}
-  th,td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
-  tr:hover td{background:rgba(255,255,255,.02)}
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg);
+    color: var(--txt-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo .pill {
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+  nav {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+  }
+  nav button {
+    background: transparent;
+    border: none;
+    color: var(--txt-secondary);
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  nav button.active,
+  nav button:hover {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: var(--bg);
+  }
+  main {
+    flex-grow: 1;
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 16px 50px;
+    width: 100%;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card > h3 {
+    margin: 0;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card > h3 .material-icons {
+    color: var(--accent);
+    font-size: 24px;
+  }
+  .content {
+    padding: 16px 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .row {
+    background: var(--bg-alt);
+    padding: 12px 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+  }
+  .row:hover {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: var(--bg);
+  }
+  .row .meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+  .toggle {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 48px;
+    height: 28px;
+    background: #394155;
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    border: 1px solid var(--border);
+    transition: background-color 0.3s ease;
+  }
+  .toggle:checked {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+  }
+  .toggle:before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .toggle:checked:before {
+    transform: translateX(20px);
+  }
+  .btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: 0;
+    color: var(--bg);
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .btn:hover {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+  }
+  .pill {
+    font-size: 12px;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: var(--txt-secondary);
+    background: var(--bg-alt);
+    user-select: none;
+  }
+  .muted {
+    color: var(--txt-secondary);
+  }
+  .hint {
+    font-size: 13px;
+    color: var(--txt-secondary);
+  }
+  /* Floorplan */
+  .plan-wrap {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .canvas {
+    background: var(--bg-alt);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    position: relative;
+    min-height: 320px;
+    max-width: 100%;
+    flex: 1 1 320px;
+    overflow: hidden;
+  }
+  .canvas img {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.95;
+    user-select: none;
+    pointer-events: none;
+  }
+  .pin {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: grab;
+    user-select: none;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+  }
+  .pin i {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--amber), var(--accent));
+    box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+    display: inline-block;
+  }
+  .pin label {
+    font-size: 13px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .pin.off i {
+    filter: grayscale(1);
+    opacity: 0.5;
+  }
+  /* Responsive */
+  @media (max-width: 650px) {
+    nav {
+      gap: 8px;
+    }
+    nav button {
+      font-size: 0.9rem;
+      padding: 6px 10px;
+    }
+    main {
+      margin: 16px 12px;
+      padding-bottom: 30px;
+    }
+  }
 </style>
 </head>
 <body>
 <header>
-  <div class="bar">
-    <div class="logo"><i></i> SmartHome Hub <span class="pill">MVP</span></div>
-    <nav id="nav"></nav>
+  <div class="logo">
+    <span class="material-icons" style="font-size:28px;color:var(--accent)">home</span>
+    SmartHome Hub <span class="pill">MVP</span>
   </div>
+  <nav id="nav"></nav>
 </header>
-
 <main id="view"></main>
 
 <script>
 /* ===========================
    SmartHome Hub – MVP Frontend
-   - Stato locale in localStorage
-   - Dispositivi manuali + "Scan" mock
-   - Planimetria con pin trascinabili
-   - Automazioni base (condizione/azione)
-   - Backup/Restore JSON
-   - Hook API pronti (Home Assistant / Alexa / backend)
-   =========================== */
+   State saved in localStorage
+   Devices, Rooms, Floorplan, Automations
+=========================== */
 
 const TABS = [
-  {id:"dash", label:"Dashboard"},
-  {id:"devices", label:"Dispositivi"},
-  {id:"floor", label:"Planimetria"},
-  {id:"auto", label:"Automazioni"},
-  {id:"backup", label:"Backup"},
-  {id:"settings", label:"Impostazioni"},
+  {id:"dash", label:"Dashboard", icon:"dashboard"},
+  {id:"devices", label:"Dispositivi", icon:"devices"},
+  {id:"floor", label:"Planimetria", icon:"map"},
+  {id:"auto", label:"Automazioni", icon:"settings_remote"},
+  {id:"backup", label:"Backup", icon:"backup"},
+  {id:"settings", label:"Impostazioni", icon:"settings"},
 ];
-const $ = (sel, el=document)=>el.querySelector(sel);
-const $$= (sel, el=document)=>[...el.querySelectorAll(sel)];
+
+const $ = (sel, el=document) => el.querySelector(sel);
+const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
 const bus = new EventTarget();
+
 const state = load() || {
-  devices: [],        // {id,name,type,room,ip,connected,on,meta:{} , x,y}
+  devices: [],        // {id,name,type,room,on,meta:{}, x,y}
   rooms: ["Ingresso","Salone","Cucina","Camera","Bagno"],
-  floorplan: {src:"", pins:{}}, // by deviceId: {x,y}
+  floorplan: {src:"", pins:{}}, // pins by device id: {x,y}
   automations: [],    // {id,name,if:{deviceId,prop,op,value}, then:{deviceId,action}}
   prefs: {theme:"dark", units:"metric"},
   createdAt: Date.now()
 };
 
-function load(){ try{return JSON.parse(localStorage.getItem("fabio_hub_v1"))}catch(e){return null} }
-function save(){ localStorage.setItem("fabio_hub_v1", JSON.stringify(state)); }
+function load(){ try { return JSON.parse(localStorage.getItem("fabio_hub_v2")); } catch(e){ return null; } }
+function save(){ localStorage.setItem("fabio_hub_v2", JSON.stringify(state)); }
 
 function uid(){ return Math.random().toString(36).slice(2,9); }
 function setTab(id){ location.hash = id; render(); }
@@ -111,428 +335,360 @@ function renderNav(){
   nav.innerHTML = "";
   TABS.forEach(t=>{
     const b=document.createElement("button");
-    b.textContent=t.label;
-    b.className = activeTab()===t.id?"active":"";
-    b.onclick=()=>setTab(t.id);
+    b.title = t.label;
+    b.innerHTML = `<span class="material-icons">${t.icon}</span> ${t.label}`;
+    b.className = activeTab()===t.id ? "active" : "";
+    b.onclick = () => setTab(t.id);
     nav.appendChild(b);
   });
 }
 
-/* ---------- VIEWS ---------- */
-
+/* ------- VIEWS -------- */
 function render(){
   renderNav();
   const v = $("#view");
+  const tab = activeTab();
+
+  if(tab==="dash") renderDashboard(v);
+  else if(tab==="devices") renderDevices(v);
+  else if(tab==="floor") renderFloorplan(v);
+  else if(tab==="auto") renderAutomations(v);
+  else if(tab==="backup") renderBackup(v);
+  else if(tab==="settings") renderSettings(v);
+  else v.textContent = "Tab non trovata";
+}
+
+/* ----- Dashboard ----- */
+function renderDashboard(v){
   v.innerHTML = "";
-  switch(activeTab()){
-    case "dash": renderDashboard(v); break;
-    case "devices": renderDevices(v); break;
-    case "floor": renderFloorplan(v); break;
-    case "auto": renderAutomations(v); break;
-    case "backup": renderBackup(v); break;
-    case "settings": renderSettings(v); break;
-    default: renderDashboard(v); break;
+  const card = document.createElement("section");
+  card.className = "card";
+  card.innerHTML = `<h3><span class="material-icons">dashboard</span> Dashboard</h3>`;
+  const content = document.createElement("div");
+  content.className = "content";
+
+  // Mostra numero dispositivi e stanze
+  content.innerHTML = `
+    <p>Dispositivi totali: <strong>${state.devices.length}</strong></p>
+    <p>Stanze configurate: <strong>${state.rooms.length}</strong></p>
+    <p>Automazioni attive: <strong>${state.automations.length}</strong></p>
+    <p>Ultimo backup: <strong>${localStorage.getItem('fabio_hub_backup_date') || 'Mai'}</strong></p>
+  `;
+
+  card.appendChild(content);
+  v.appendChild(card);
+}
+
+/* ----- Devices ----- */
+function renderDevices(v){
+  v.innerHTML = "";
+  const card = document.createElement("section");
+  card.className = "card";
+  card.innerHTML = `<h3><span class="material-icons">devices</span> Dispositivi</h3>`;
+
+  const content = document.createElement("div");
+  content.className = "content";
+
+  if(state.devices.length === 0){
+    content.innerHTML = `<p class="muted">Nessun dispositivo aggiunto. Aggiungine uno nuovo!</p>`;
+  } else {
+    const list = document.createElement("div");
+    list.className = "list";
+
+    state.devices.forEach(d=>{
+      const row = document.createElement("div");
+      row.className = "row";
+      const isOn = d.on ? "checked" : "";
+      row.innerHTML = `
+        <div>
+          <strong>${d.name}</strong> <span class="pill">${d.type}</span> <span class="muted">(${d.room || "Nessuna stanza"})</span>
+        </div>
+        <input type="checkbox" class="toggle" data-id="${d.id}" ${isOn} aria-label="Accendi o spegni dispositivo" />
+      `;
+      list.appendChild(row);
+    });
+    content.appendChild(list);
   }
-}
 
-/* -------- DASHBOARD -------- */
-function renderDashboard(container){
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `
-    <h3>Dashboard</h3>
-    <div class="content">
-      <p>Dispositivi totali: <strong>${state.devices.length}</strong></p>
-      <p>Automazioni attive: <strong>${state.automations.length}</strong></p>
-      <p>Ultimo salvataggio: <small>${new Date(state.createdAt).toLocaleString()}</small></p>
-    </div>
-  `;
-  container.appendChild(card);
-}
+  // Aggiungi bottone aggiunta dispositivo
+  const addBtn = document.createElement("button");
+  addBtn.className = "btn";
+  addBtn.textContent = "Aggiungi dispositivo";
+  addBtn.onclick = () => addDevice();
+  content.appendChild(addBtn);
 
-/* -------- DEVICES -------- */
-function renderDevices(container){
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3>Dispositivi</h3>`;
-  
-  const list = document.createElement("div");
-  list.className = "list";
-  
-  // Lista dispositivi
-  state.devices.forEach(d=>{
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `
-      <div class="meta">
-        <strong>${d.name}</strong> - <em>${d.type}</em> in <em>${d.room}</em>
-      </div>
-      <label>
-        <input type="checkbox" class="toggle" data-id="${d.id}" ${d.on?"checked":""}/>
-      </label>
-    `;
-    list.appendChild(row);
-  });
-  
-  card.appendChild(list);
-  
-  // Form aggiunta nuovo dispositivo
-  const form = document.createElement("form");
-  form.innerHTML = `
-    <h4>Aggiungi dispositivo</h4>
-    <div class="fld">
-      <input type="text" name="name" placeholder="Nome" required/>
-      <select name="type" required>
-        <option value="" disabled selected>Tipo</option>
-        <option value="Lampada">Lampada</option>
-        <option value="Sensore">Sensore</option>
-        <option value="Presenza">Sensore Presenza</option>
-        <option value="Termostato">Termostato</option>
-        <option value="Altoparlante">Altoparlante</option>
-      </select>
-      <select name="room" required>
-        <option value="" disabled selected>Stanza</option>
-        ${state.rooms.map(r=>`<option value="${r}">${r}</option>`).join("")}
-      </select>
-      <button class="btn" type="submit">Aggiungi</button>
-    </div>
-  `;
-  form.onsubmit = e=>{
-    e.preventDefault();
-    const fd = new FormData(form);
-    const device = {
-      id: uid(),
-      name: fd.get("name"),
-      type: fd.get("type"),
-      room: fd.get("room"),
-      ip: "",
-      connected: true,
-      on: false,
-      meta: {},
-      x: null,
-      y: null
-    };
-    state.devices.push(device);
-    save();
-    render();
-  };
-  card.appendChild(form);
-  
-  // Toggle on/off dispositivo
-  list.querySelectorAll("input.toggle").forEach(input=>{
-    input.onchange = e=>{
+  card.appendChild(content);
+  v.appendChild(card);
+
+  // Eventi toggle
+  $$(".toggle").forEach(toggle=>{
+    toggle.onchange = e => {
       const id = e.target.dataset.id;
-      const d = state.devices.find(dev=>dev.id===id);
-      if(d){
-        d.on = e.target.checked;
+      const device = state.devices.find(d=>d.id===id);
+      if(device){
+        device.on = e.target.checked;
         save();
-        render();
-      }
-    };
-  });
-  
-  container.appendChild(card);
-}
-
-/* -------- FLOORPLAN -------- */
-function renderFloorplan(container){
-  const card = document.createElement("section");
-  card.className = "card plan-wrap";
-  
-  // Immagine planimetria
-  const imgSrc = state.floorplan.src || "";
-  
-  card.innerHTML = `
-    <h3>Planimetria</h3>
-    <div class="canvas">
-      ${imgSrc ? `<img src="${imgSrc}" alt="Planimetria"/>` : `<p class="muted">Carica un'immagine della planimetria per posizionare i dispositivi</p>`}
-      ${state.devices.map(d=>{
-        if(d.x != null && d.y != null){
-          return `<div class="pin${d.on ? "" : " off"}" data-id="${d.id}" style="left:${d.x*100}%; top:${d.y*100}%">
-            <i></i><label>${d.name}</label>
-          </div>`;
-        }
-        return "";
-      }).join("")}
-    </div>
-    <form id="uploadFloorplan" class="fld">
-      <input type="file" accept="image/*"/>
-      <button class="btn" type="submit">Carica Planimetria</button>
-    </form>
-    <p class="hint">Trascina i pin per posizionare i dispositivi.</p>
-  `;
-
-  container.appendChild(card);
-  
-  const canvas = container.querySelector(".canvas");
-  const pins = canvas.querySelectorAll(".pin");
-  
-  // Drag & Drop pins
-  pins.forEach(pin=>{
-    pin.style.touchAction = "none";
-    let dragging = false;
-    let startX, startY;
-    
-    function onPointerDown(e){
-      e.preventDefault();
-      dragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      pin.setPointerCapture(e.pointerId);
-    }
-    function onPointerMove(e){
-      if(!dragging) return;
-      e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      let dx = e.clientX - startX;
-      let dy = e.clientY - startY;
-      startX = e.clientX;
-      startY = e.clientY;
-      
-      let left = pin.offsetLeft + dx;
-      let top = pin.offsetTop + dy;
-      // clamp
-      left = Math.min(rect.width, Math.max(0, left));
-      top = Math.min(rect.height, Math.max(0, top));
-      
-      pin.style.left = left + "px";
-      pin.style.top = top + "px";
-    }
-    function onPointerUp(e){
-      if(!dragging) return;
-      dragging = false;
-      pin.releasePointerCapture(e.pointerId);
-      const rect = canvas.getBoundingClientRect();
-      const left = (pin.offsetLeft + pin.offsetWidth/2) / rect.width;
-      const top = (pin.offsetTop + pin.offsetHeight) / rect.height;
-      const id = pin.dataset.id;
-      const dev = state.devices.find(d=>d.id === id);
-      if(dev){
-        dev.x = left;
-        dev.y = top;
-        save();
-        render();
+        bus.dispatchEvent(new CustomEvent("device-toggled", {detail: device}));
       }
     }
-    
-    pin.addEventListener("pointerdown", onPointerDown);
-    pin.addEventListener("pointermove", onPointerMove);
-    pin.addEventListener("pointerup", onPointerUp);
-    pin.addEventListener("pointercancel", onPointerUp);
   });
-  
-  // Upload immagine planimetria
-  const form = container.querySelector("#uploadFloorplan");
-  form.onsubmit = e=>{
-    e.preventDefault();
-    const fileInput = form.querySelector("input[type=file]");
-    if(fileInput.files.length){
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = function(ev){
-        state.floorplan.src = ev.target.result;
-        save();
-        render();
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 }
 
-/* -------- AUTOMATIONS -------- */
-function renderAutomations(container){
+function addDevice(){
+  const name = prompt("Nome dispositivo:");
+  if(!name) return alert("Nome obbligatorio");
+  const type = prompt("Tipo dispositivo (es. lampada, sensore):") || "generico";
+  const room = prompt(`Stanza (scegli tra: ${state.rooms.join(", ")}):`) || "";
+  const newDevice = {id: uid(), name, type, room, on:false, meta:{}, x:50, y:50};
+  state.devices.push(newDevice);
+  save();
+  render();
+}
+
+/* ----- Floorplan ----- */
+function renderFloorplan(v){
+  v.innerHTML = "";
   const card = document.createElement("section");
   card.className = "card";
-  card.innerHTML = `<h3>Automazioni</h3>`;
-  
-  const list = document.createElement("div");
-  list.className = "list";
-  
-  state.automations.forEach(auto=>{
-    const row = document.createElement("div");
-    row.className = "row";
-    const dIf = state.devices.find(d=>d.id===auto.if.deviceId);
-    const dThen = state.devices.find(d=>d.id===auto.then.deviceId);
-    row.innerHTML = `
-      <div class="meta">
-        <strong>${auto.name}</strong><br/>
-        Se <em>${dIf ? dIf.name : "(dispositivo sconosciuto)"}</em> 
-        <code>${auto.if.prop} ${auto.if.op} ${auto.if.value}</code> allora 
-        <em>${dThen ? dThen.name : "(dispositivo sconosciuto)"}</em> fa <code>${auto.then.action}</code>
-      </div>
-      <button class="btn outline" data-id="${auto.id}">Elimina</button>
-    `;
-    list.appendChild(row);
-  });
-  
-  card.appendChild(list);
-  
-  // Form aggiungi automazione
-  const form = document.createElement("form");
-  form.innerHTML = `
-    <h4>Nuova Automazione</h4>
-    <div class="fld">
-      <input type="text" name="name" placeholder="Nome automazione" required/>
-      <select name="deviceIf" required>
-        <option value="" disabled selected>Dispositivo Condizione</option>
-        ${state.devices.map(d=>`<option value="${d.id}">${d.name}</option>`).join("")}
-      </select>
-      <select name="prop" required>
-        <option value="" disabled selected>Proprietà</option>
-        <option value="on">On/Off</option>
-        <option value="connected">Connesso</option>
-      </select>
-      <select name="op" required>
-        <option value="" disabled selected>Operatore</option>
-        <option value="==">==</option>
-        <option value="!=">!=</option>
-      </select>
-      <select name="deviceThen" required>
-        <option value="" disabled selected>Dispositivo Azione</option>
-        ${state.devices.map(d=>`<option value="${d.id}">${d.name}</option>`).join("")}
-      </select>
-      <select name="action" required>
-        <option value="" disabled selected>Azione</option>
-        <option value="turn_on">Accendi</option>
-        <option value="turn_off">Spegni</option>
-      </select>
-      <button class="btn" type="submit">Aggiungi</button>
-    </div>
-  `;
-  form.onsubmit = e=>{
-    e.preventDefault();
-    const fd = new FormData(form);
-    const auto = {
-      id: uid(),
-      name: fd.get("name"),
-      if: {
-        deviceId: fd.get("deviceIf"),
-        prop: fd.get("prop"),
-        op: fd.get("op"),
-        value: fd.get("op") === "==" ? true : false
-      },
-      then: {
-        deviceId: fd.get("deviceThen"),
-        action: fd.get("action")
+  card.innerHTML = `<h3><span class="material-icons">map</span> Planimetria</h3>`;
+
+  const content = document.createElement("div");
+  content.className = "content";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "plan-wrap";
+
+  // Immagine planimetria con pins
+  const canvas = document.createElement("div");
+  canvas.className = "canvas";
+
+  if(state.floorplan.src){
+    const img = document.createElement("img");
+    img.src = state.floorplan.src;
+    canvas.appendChild(img);
+  } else {
+    canvas.innerHTML = `<p class="muted" style="padding:16px;">Nessuna planimetria caricata.</p>`;
+  }
+
+  // Pins dispositivi posizionati
+  state.devices.forEach(d=>{
+    if(d.x !== undefined && d.y !== undefined && state.floorplan.src){
+      const pin = document.createElement("div");
+      pin.className = "pin" + (d.on ? "" : " off");
+      pin.style.left = d.x + "%";
+      pin.style.top = d.y + "%";
+      pin.title = d.name;
+      pin.innerHTML = `<i class="material-icons">place</i><label>${d.name}</label>`;
+
+      // Drag & drop semplice
+      pin.onpointerdown = e => {
+        e.preventDefault();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const rect = canvas.getBoundingClientRect();
+        function onMove(ev){
+          let dx = ev.clientX - startX;
+          let dy = ev.clientY - startY;
+          let newX = ((pin.offsetLeft + dx) / rect.width) * 100;
+          let newY = ((pin.offsetTop + dy) / rect.height) * 100;
+          newX = Math.min(100, Math.max(0, newX));
+          newY = Math.min(100, Math.max(0, newY));
+          pin.style.left = newX + "%";
+          pin.style.top = newY + "%";
+        }
+        function onUp(ev){
+          document.removeEventListener("pointermove", onMove);
+          document.removeEventListener("pointerup", onUp);
+          // Salvo posizione in device
+          d.x = parseFloat(pin.style.left);
+          d.y = parseFloat(pin.style.top);
+          save();
+        }
+        document.addEventListener("pointermove", onMove);
+        document.addEventListener("pointerup", onUp);
       }
-    };
-    state.automations.push(auto);
-    save();
-    render();
-  };
-  card.appendChild(form);
-  
-  // Elimina automazioni
-  list.querySelectorAll("button").forEach(btn=>{
-    btn.onclick = e=>{
-      const id = btn.dataset.id;
-      state.automations = state.automations.filter(a=>a.id !== id);
+
+      canvas.appendChild(pin);
+    }
+  });
+
+  wrapper.appendChild(canvas);
+
+  // Upload planimetria
+  const inputFile = document.createElement("input");
+  inputFile.type = "file";
+  inputFile.accept = "image/*";
+  inputFile.style.marginTop = "16px";
+  inputFile.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      state.floorplan.src = ev.target.result;
       save();
       render();
     };
-  });
-  
-  container.appendChild(card);
+    reader.readAsDataURL(file);
+  };
+  content.appendChild(wrapper);
+  content.appendChild(inputFile);
+
+  card.appendChild(content);
+  v.appendChild(card);
 }
 
-/* -------- BACKUP -------- */
-function renderBackup(container){
+/* ----- Automations ----- */
+function renderAutomations(v){
+  v.innerHTML = "";
   const card = document.createElement("section");
   card.className = "card";
-  card.innerHTML = `<h3>Backup & Restore</h3>`;
-  
-  // Export JSON
-  const exportBtn = document.createElement("button");
-  exportBtn.className = "btn";
-  exportBtn.textContent = "Esporta Backup";
-  exportBtn.onclick = ()=>{
-    const dataStr = JSON.stringify(state, null, 2);
-    const blob = new Blob([dataStr], {type:"application/json"});
+  card.innerHTML = `<h3><span class="material-icons">settings_remote</span> Automazioni</h3>`;
+  const content = document.createElement("div");
+  content.className = "content";
+
+  if(state.automations.length === 0){
+    content.innerHTML = `<p class="muted">Nessuna automazione configurata. Creane una nuova!</p>`;
+  } else {
+    const list = document.createElement("div");
+    list.className = "list";
+    state.automations.forEach(a=>{
+      const row = document.createElement("div");
+      row.className = "row";
+      row.textContent = `${a.name} - IF ${a.if.deviceId} ${a.if.prop} ${a.if.op} ${a.if.value} THEN ${a.then.deviceId} ${a.then.action}`;
+      list.appendChild(row);
+    });
+    content.appendChild(list);
+  }
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "btn";
+  addBtn.textContent = "Aggiungi automazione";
+  addBtn.onclick = () => addAutomation();
+  content.appendChild(addBtn);
+
+  card.appendChild(content);
+  v.appendChild(card);
+}
+
+function addAutomation(){
+  const name = prompt("Nome automazione:");
+  if(!name) return alert("Nome obbligatorio");
+
+  if(state.devices.length < 2) return alert("Aggiungi almeno due dispositivi prima!");
+
+  // Semplice creazione via prompt
+  const deviceIf = prompt("IF: id dispositivo trigger:");
+  const prop = prompt("Proprietà (es: on):");
+  const op = prompt("Operatore (es: ==):");
+  const value = prompt("Valore (es: true):");
+
+  const deviceThen = prompt("THEN: id dispositivo azione:");
+  const action = prompt("Azione (es: toggle):");
+
+  if(!deviceIf || !prop || !op || !deviceThen || !action) return alert("Dati incompleti");
+
+  const auto = {
+    id: uid(),
+    name,
+    if: {deviceId: deviceIf, prop, op, value},
+    then: {deviceId: deviceThen, action}
+  };
+  state.automations.push(auto);
+  save();
+  render();
+}
+
+/* ----- Backup ----- */
+function renderBackup(v){
+  v.innerHTML = "";
+  const card = document.createElement("section");
+  card.className = "card";
+  card.innerHTML = `<h3><span class="material-icons">backup</span> Backup</h3>`;
+  const content = document.createElement("div");
+  content.className = "content";
+
+  const dataStr = JSON.stringify(state, null, 2);
+  content.innerHTML = `
+    <p>Puoi scaricare il backup dei dati attuali in formato JSON.</p>
+    <textarea readonly style="width:100%;height:180px;background:#222;color:#eee;padding:12px;border-radius:8px;resize:none; font-family: monospace;">${dataStr}</textarea>
+  `;
+
+  const btnExport = document.createElement("button");
+  btnExport.className = "btn";
+  btnExport.textContent = "Scarica backup JSON";
+  btnExport.onclick = () => {
+    const blob = new Blob([dataStr], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `smarthomehub-backup-${Date.now()}.json`;
+    a.download = `smarthome-backup-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
-  card.appendChild(exportBtn);
-  
-  // Import JSON
-  const form = document.createElement("form");
-  form.innerHTML = `
-    <h4>Importa Backup</h4>
-    <input type="file" accept="application/json" required/>
-    <button class="btn" type="submit">Importa</button>
-  `;
-  form.onsubmit = e=>{
-    e.preventDefault();
-    const fileInput = form.querySelector("input[type=file]");
-    if(fileInput.files.length){
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = function(ev){
-        try{
-          const imported = JSON.parse(ev.target.result);
-          if(imported.devices && imported.rooms){
-            Object.assign(state, imported);
-            save();
-            alert("Backup importato con successo!");
-            render();
-          }else{
-            alert("Backup non valido.");
-          }
-        }catch{
-          alert("Errore durante l'importazione.");
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
-  card.appendChild(form);
-  container.appendChild(card);
-}
-
-/* -------- SETTINGS -------- */
-function renderSettings(container){
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `<h3>Impostazioni</h3>`;
-  
-  const form = document.createElement("form");
-  form.innerHTML = `
-    <div class="fld">
-      <label>Temi:
-        <select name="theme">
-          <option value="dark" ${state.prefs.theme==="dark"?"selected":""}>Scuro</option>
-          <option value="light" ${state.prefs.theme==="light"?"selected":""}>Chiaro</option>
-        </select>
-      </label>
-      <label>Unità di misura:
-        <select name="units">
-          <option value="metric" ${state.prefs.units==="metric"?"selected":""}>Metrico</option>
-          <option value="imperial" ${state.prefs.units==="imperial"?"selected":""}>Imperiale</option>
-        </select>
-      </label>
-      <button class="btn" type="submit">Salva Impostazioni</button>
-    </div>
-  `;
-  form.onsubmit = e=>{
-    e.preventDefault();
-    const fd = new FormData(form);
-    state.prefs.theme = fd.get("theme");
-    state.prefs.units = fd.get("units");
-    save();
-    alert("Impostazioni salvate!");
+    localStorage.setItem('fabio_hub_backup_date', new Date().toLocaleString());
     render();
   };
-  card.appendChild(form);
-  container.appendChild(card);
+
+  content.appendChild(btnExport);
+  card.appendChild(content);
+  v.appendChild(card);
 }
 
-/* ---------- INIT ---------- */
-window.addEventListener("hashchange", render);
-render();
+/* ----- Settings ----- */
+function renderSettings(v){
+  v.innerHTML = "";
+  const card = document.createElement("section");
+  card.className = "card";
+  card.innerHTML = `<h3><span class="material-icons">settings</span> Impostazioni</h3>`;
+  const content = document.createElement("div");
+  content.className = "content";
 
+  content.innerHTML = `
+    <label>
+      Tema:
+      <select id="themeSelect">
+        <option value="dark" ${state.prefs.theme==="dark" ? "selected" : ""}>Scuro</option>
+        <option value="light" ${state.prefs.theme==="light" ? "selected" : ""}>Chiaro</option>
+      </select>
+    </label>
+  `;
+
+  const themeSelect = $("#themeSelect");
+  themeSelect.onchange = e => {
+    state.prefs.theme = e.target.value;
+    applyTheme();
+    save();
+  };
+
+  card.appendChild(content);
+  v.appendChild(card);
+}
+
+function applyTheme(){
+  if(state.prefs.theme === "light"){
+    document.documentElement.style.setProperty("--bg", "#f8f9fa");
+    document.documentElement.style.setProperty("--bg-alt", "#e9ecef");
+    document.documentElement.style.setProperty("--card-bg", "#ffffff");
+    document.documentElement.style.setProperty("--txt-primary", "#212529");
+    document.documentElement.style.setProperty("--txt-secondary", "#6c757d");
+    document.documentElement.style.setProperty("--border", "#dee2e6");
+    document.documentElement.style.setProperty("--shadow", "0 4px 12px rgba(0,0,0,0.1)");
+  } else {
+    document.documentElement.style.setProperty("--bg", "#121417");
+    document.documentElement.style.setProperty("--bg-alt", "#1e222a");
+    document.documentElement.style.setProperty("--card-bg", "#252a38");
+    document.documentElement.style.setProperty("--txt-primary", "#e8ecf1");
+    document.documentElement.style.setProperty("--txt-secondary", "#8a94a7");
+    document.documentElement.style.setProperty("--border", "#303752");
+    document.documentElement.style.setProperty("--shadow", "0 4px 12px rgba(0, 0, 0, 0.5)");
+  }
+}
+
+window.addEventListener("hashchange", render);
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyTheme();
+  render();
+});
 </script>
 </body>
 </html>
