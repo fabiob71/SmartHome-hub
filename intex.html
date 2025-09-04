@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SmartHome Hub – Fabio</title>
+<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a22; --muted:#8a94a7; --txt:#e8ecf1;
+    --acc:#6ae3ff; --acc2:#7bffb7; --red:#ff6b6b; --amber:#ffc857;
+    --ok:#38d39f; --card:#1b2130; --border:#232a3a; --shadow:0 8px 28px rgba(0,0,0,.35)
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0c0f14 0%,#0f1115 100%);color:var(--txt);font:15px/1.45 system-ui, -apple-system, Segoe UI, Roboto}
+  header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  .bar{max-width:1100px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700}
+  .logo i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:inline-block}
+  nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  nav button{background:transparent;border:1px solid var(--border);color:var(--txt);padding:8px 10px;border-radius:10px;cursor:pointer}
+  nav button.active, nav button:hover{border-color:var(--acc);box-shadow:0 0 0 2px rgba(106,227,255,.15)}
+  main{max-width:1100px;margin:14px auto;padding:0 16px 50px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+  .card{grid-column:span 12;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .card>h3{margin:0;padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .card>div.content{padding:14px 16px}
+  @media(min-width:900px){
+    .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}
+  }
+  .muted{color:var(--muted)}
+  .pill{font-size:12px;border:1px solid var(--border);padding:4px 8px;border-radius:999px}
+  .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:0;color:#0b0e13;font-weight:700;padding:10px 12px;border-radius:12px;cursor:pointer}
+  .btn.outline{background:transparent;border:1px solid var(--acc);color:var(--txt)}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.02);padding:10px;border-radius:12px;border:1px solid var(--border)}
+  .row .meta{display:flex;align-items:center;gap:10px}
+  .toggle{appearance:none;width:48px;height:28px;background:#394155;border-radius:999px;position:relative;cursor:pointer;outline:none;border:1px solid var(--border)}
+  .toggle:checked{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+  .toggle:before{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+  .toggle:checked:before{transform:translateX(20px)}
+  .fld{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  .fld input,.fld select,.fld textarea{background:#11151f;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:10px;min-width:220px}
+  .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;background:#0b0e13;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+  .hint{font-size:12px;color:var(--muted)}
+  /* floorplan */
+  .plan-wrap{display:grid;grid-template-columns:1fr 320px;gap:12px}
+  .canvas{background:#0b0e13;border:1px dashed #2a3246;border-radius:12px;position:relative;min-height:320px;overflow:hidden}
+  .canvas img{width:100%;height:auto;display:block;opacity:.95}
+  .pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:grab}
+  .pin i{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--acc));box-shadow:0 2px 10px rgba(0,0,0,.5)}
+  .pin label{font-size:12px;background:#0b0e13;border:1px solid var(--border);padding:3px 6px;border-radius:6px}
+  .pin.off i{filter:grayscale(1);opacity:.5}
+  /* tables */
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
+  tr:hover td{background:rgba(255,255,255,.02)}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo"><i></i> SmartHome Hub <span class="pill">MVP</span></div>
+    <nav id="nav"></nav>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<script>
+/* ===========================
+   SmartHome Hub – MVP Frontend
+   - Stato locale in localStorage
+   - Dispositivi manuali + "Scan" mock
+   - Planimetria con pin trascinabili
+   - Automazioni base (condizione/azione)
+   - Backup/Restore JSON
+   - Hook API pronti (Home Assistant / Alexa / backend)
+   =========================== */
+
+const TABS = [
+  {id:"dash", label:"Dashboard"},
+  {id:"devices", label:"Dispositivi"},
+  {id:"floor", label:"Planimetria"},
+  {id:"auto", label:"Automazioni"},
+  {id:"backup", label:"Backup"},
+  {id:"settings", label:"Impostazioni"},
+];
+const $ = (sel, el=document)=>el.querySelector(sel);
+const $$= (sel, el=document)=>[...el.querySelectorAll(sel)];
+const bus = new EventTarget();
+const state = load() || {
+  devices: [],        // {id,name,type,room,ip,connected,on,meta:{} , x,y}
+  rooms: ["Ingresso","Salone","Cucina","Camera","Bagno"],
+  floorplan: {src:"", pins:{}}, // by id: {x,y}
+  automations: [],    // {id,name,if:{deviceId,prop,op,value}, then:{deviceId,action}}
+  prefs: {theme:"dark", units:"metric"},
+  createdAt: Date.now()
+};
+
+function load(){ try{return JSON.parse(localStorage.getItem("fabio_hub_v1"))}catch(e){return null} }
+function save(){ localStorage.setItem("fabio_hub_v1", JSON.stringify(state)); }
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function setTab(id){ location.hash = id; render(); }
+function activeTab(){ return location.hash?.slice(1) || "dash"; }
+
+function renderNav(){
+  const nav = $("#nav");
+  nav.innerHTML = "";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.textContent=t.label;
+    b.className = activeTab()===t.id?"active":"";
+    b.onclick=()=>setTab(t.id);
+    nav.appendChild(b);
+  });
+}
+
+/* ---------- Views ---------- */
+function r(){ renderNav(); const v=$("#view"); v.innerHTML="";
+  const tab=activeTab();
+  if(tab==="dash") viewDashboard(v);
+  if(tab==="devices") viewDevices(v);
+  if(tab==="floor") viewFloor(v);
+  if(tab==="auto") viewAutomations(v);
+  if(tab==="backup") viewBackup(v);
+  if(tab==="settings") viewSettings(v);
+}
+window.addEventListener("hashchange", r);
+bus.addEventListener("state", ()=>{ save(); r(); });
+
+/* ---------- Dashboard ---------- */
+function viewDashboard(v){
+  v.innerHTML = `
+  <div class="grid">
+    <section class="card col-8">
+      <h3>Stato Casa <span class="hint">(${state.devices.length} dispositivi)</span></h3>
+      <div class="content">
+        <div class="list" id="dash-list"></div>
+      </div>
+    </section>
+    <section class="card col-4">
+      <h3>Azioni rapide</h3>
+      <div class="content">
+        <div class="fld">
+          <button class="btn" id="allOn">Accendi tutto</button>
+          <button class="btn outline" id="allOff">Spegni tutto</button>
+        </div>
+        <div class="fld">
+          <button class="btn" id="scanMock">Scansione dispositivi (mock)</button>
+        </div>
+        <p class="hint">Nota: la scansione reale di rete richiede un backend locale
+        (browser non può fare discovery mDNS/ARP). Questo bottone aggiunge esempi.</p>
+      </div>
+    </section>
+  </div>`;
+  const list = $("#dash-list");
+  if(!state.devices.length){
+    list.innerHTML = <div class="muted">Nessun dispositivo. Vai in <span class="kbd">Dispositivi</span> → “Aggiungi” o usa “Scansione (mock)”.</div>;
+  } else {
+    state.devices.forEach(d=>{
+      const row=document.createElement("div"); row.className="row";
+      row.innerHTML = `
+        <div class="meta">
+          <span class="pill">${d.type||"?"}</span>
+          <strong>${d.name}</strong>
+          <span class="muted">${d.room||"Senza stanza"}</span>
+          <span class="muted">${d.ip||""}</span>
+        </div>
+        <div>
+          <input type="checkbox" class="toggle" ${d.on?"checked":""} data-id="${d.id}">
+        </div>`;
+      row.querySelector(".toggle").onchange=(e)=>toggleDevice(d.id, e.target.checked);
+      list.appendChild(row);
+    });
+  }
+  $("#allOn").onclick=()=>bulkPower(true);
+  $("#allOff").onclick=()=>bulkPower(false);
+  $("#scanMock").onclick=scanMock;
+}
+
+/* ---------- Devices ---------- */
+function viewDevices(v){
+  v.innerHTML = `
+  <section class="card">
+    <h3>Dispositivi</h3>
+    <div class="content">
+      <div class="fld">
+        <input id="devName" placeholder="Nome (es. Lampada Salone)">
+        <select id="devType">
+          <option>Luce</option><option>Presa</option><option>Sensore</option>
+          <option>Termostato</option><option>Tenda</option><option>Altro</option>
+        </select>
+        <select id="devRoom">${state.rooms.map(r=><option>${r}</option>).join("")}</select>
+        <input id="devIP" placeholder="IP (opzionale)">
+        <button class="btn" id="addDev">Aggiungi</button>
+      </div>
+      <div class="list" id="devList"></div>
+    </div>
+  </section>`;
+  $("#addDev").onclick=()=>{
+    const name=$("#devName").value.trim();
+    if(!name) return alert("Inserisci un nome");
+    const d={id:uid(), name, type:$("#devType").value, room:$("#devRoom").value, ip:$("#devIP").value.trim(), connected:true, on:false, meta:{}};
+    state.devices.push(d); bus.dispatchEvent(new Event("state"));
+  }
+  const devList=$("#devList");
+  if(!state.devices.length){ devList.innerHTML=<div class="muted">Ancora vuoto.</div>; return; }
+  state.devices.forEach(d=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`
+      <div class="meta">
+        <span class="pill">${d.type}</span><strong>${d.name}</strong>
+        <span class="muted">${d.room}</span><span class="muted">${d.ip||""}</span>
+      </div>
+      <div class="meta">
+        <input type="checkbox" class="toggle" ${d.on?"checked":""} data-id="${d.id}">
+        <button class="btn outline" data-edit="${d.id}">Modifica</button>
+        <button class="btn outline" data-del="${d.id}">Elimina</button>
+      </div>`;
+    row.querySelector(".toggle").onchange=(e)=>toggleDevice(d.id, e.target.checked);
+    row.querySelector("[data-del]").onclick=()=>{ if(confirm("Eliminare dispositivo?")){ state.devices=state.devices.filter(x=>x.id!==d.id); bus.dispatchEvent(new Event("state")); } };
+    row.querySelector("[data-edit]").onclick=()=>editDevice(d.id);
+    devList.appendChild(row);
+  });
+}
+
+function editDevice(id){
+  const d=state.devices.find(x=>x.id===id); if(!d) return;
+  const name=prompt("Nome", d.name); if(name===null) return;
+  const room=prompt("Stanza", d.room || ""); if(room===null) return;
+  const ip=prompt("IP", d.ip || ""); if(ip===null) return;
+  d.name=name; d.room=room; d.ip=ip; bus.dispatchEvent(new Event("state"));
+}
+
+function toggleDevice(id, on){
+  const d=state.devices.find(x=>x.id===id); if(!d) return;
+  d.on=on;
+  // Hook: qui puoi chiamare Home Assistant / HTTP API:
+  // fetch('http://homeassistant.local:8123/api/services/light/turn_on', { ... })
+  bus.dispatchEvent(new Event("state"));
+}
+function bulkPower(on){ state.devices.forEach(d=>d.on=on); bus.dispatchEvent(new Event("state")); }
+
+function scanMock(){
+  const samples=[
+    {name:"Lampada Salone", type:"Luce", room:"Salone", ip:"192.168.1.31"},
+    {name:"Presa TV", type:"Presa", room:"Salone", ip:"192.168.1.32"},
+    {name:"Sensore Porta", type:"Sensore", room:"Ingresso", ip:"192.168.1.41"},
+    {name:"Termostato", type:"Termostato", room:"Cucina", ip:"192.168.1.51"},
+  ];
+  samples.forEach(s=>state.devices.push({...s, id:uid(), connected:true, on:false}));
+  bus.dispatchEvent(new Event("state"));
+}
+
+/* ---------- Floorplan ---------- */
+function viewFloor(v){
+  v.innerHTML = `
+  <section class="card">
+    <h3>Planimetria</h3>
+    <div class="content">
+      <div class="fld">
+        <input type="file" id="planFile" accept="image/*">
+        <button class="btn" id="clearPlan">Rimuovi planimetria</button>
+      </div>
+      <div class="plan-wrap">
+        <div class="canvas" id="canvas">${state.floorplan.src?<img id="planImg" src="${state.floorplan.src}">:<div class="muted" style="padding:20px">Carica una foto/immagine della planimetria.</div>}</div>
+        <div>
+          <div class="fld"><select id="pinDevice">${state.devices.map(d=><option value="${d.id}">${d.name}</option>).join("")}</select><button class="btn" id="dropPin">Piazza pin</button></div>
+          <p class="hint">Consiglio: carica la piantina, poi aggiungi i pin dei dispositivi e trascinali nella posizione giusta.</p>
+          <div id="pinLegend"></div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+  $("#planFile").onchange = (e)=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{ state.floorplan.src=r.result; bus.dispatchEvent(new Event("state")); };
+    r.readAsDataURL(f);
+  };
+  $("#clearPlan").onclick=()=>{ state.floorplan={src:"",pins:{}}; bus.dispatchEvent(new Event("state")); };
+
+  const canvas=$("#canvas");
+  if(state.floorplan.src){
+    // Render pins
+    state.devices.forEach(d=>{
+      const pos = state.floorplan.pins[d.id];
+      if(!pos) return;
+      const el=document.createElement("div");
+      el.className="pin"+(d.on?"":" off");
+      el.style.left=pos.x+"%"; el.style.top=pos.y+"%";
+      el.draggable=true;
+      el.innerHTML=<i></i><label>${d.name}</label>;
+      el.ondragstart=(ev)=>{ ev.dataTransfer.setData("text/plain", JSON.stringify({id:d.id})); };
+      el.onmousedown=()=>{}; // for cursor
+      canvas.appendChild(el);
+    });
+
+    // drop move
+    canvas.ondragover=(e)=>e.preventDefault();
+    canvas.ondrop=(e)=>{
+      e.preventDefault();
+      const data=JSON.parse(e.dataTransfer.getData("text/plain"));
+      const rect=canvas.getBoundingClientRect();
+      const x=(e.clientX-rect.left)/rect.width*100;
+      const y=(e.clientY-rect.top)/rect.height*100;
+      state.floorplan.pins[data.id]={x,y};
+      bus.dispatchEvent(new Event("state"));
+    };
+  }
+
+  $("#dropPin").onclick=()=>{
+    const id=$("#pinDevice").value;
+    state.floorplan.pins[id]={x:50,y:50};
+    bus.dispatchEvent(new Event("state"));
+  };
+
+  $("#pinLegend").innerHTML = `
+    <table>
+      <thead><tr><th>Dispositivo</th><th>Posizione</th><th>Stato</th><th></th></tr></thead>
+      <tbody>
+      ${state.devices.map(d=>{
+        const p=state.floorplan.pins[d.id];
+        return `<tr>
+          <td>${d.name}</td>
+          <td>${p?${p.x.toFixed(1)}%, ${p.y.toFixed(1)}%:"-"}</td>
+          <td>${d.on?"ON":"OFF"}</td>
+          <td>${p?<button class="btn outline" data-rm="${d.id}">Rimuovi pin</button>:""}</td>
+        </tr>`;
+      }).join("")}
+      </tbody>
+    </table>`;
+  $$("#pinLegend [data-rm]").forEach(b=>b.onclick=()=>{ delete state.floorplan.pins[b.dataset.rm]; bus.dispatchEvent(new Event("state")); });
+}
+
+/* ---------- Automations ---------- */
+function viewAutomations(v){
+  v.innerHTML = `
+  <section class="card">
+    <h3>Automazioni</h3>
+    <div class="content">
+      <div class="fld">
+        <input id="aName" placeholder="Nome automazione">
+        <select id="aIfDev">${state.devices.map(d=><option value="${d.id}">${d.name}</option>).join("")}</select>
+        <select id="aIfProp"><option value="on">stato ON/OFF</option></select>
+        <select id="aIfOp"><option value="==">==</option><option value="!=">!=</option></select>
+        <select id="aIfVal"><option value="true">true</option><option value="false">false</option></select>
+      </div>
+      <div class="fld">
+        <span class="muted">Allora →</span>
+        <select id="aThenDev">${state.devices.map(d=><option value="${d.id}">${d.name}</option>).join("")}</select>
+        <select id="aThenAct"><option value="on">accendi</option><option value="off">spegni</option></select>
+        <button class="btn" id="addAuto">Crea automazione</button>
+      </div>
+      <div id="autoList" class="list" style="margin-top:10px"></div>
+      <p class="hint">Motore demo: le automazioni vengono valutate quando cambi lo stato dei dispositivi nel cruscotto.</p>
+    </div>
+  </section>`;
+  $("#addAuto").onclick=()=>{
+    const a={id:uid(), name:$("#aName").value||"Automazione",
+      if:{deviceId:$("#aIfDev").value, prop:$("#aIfProp").value, op:$("#aIfOp").value, value:$("#aIfVal").value==="true"},
+      then:{deviceId:$("#aThenDev").value, action:$("#aThenAct").value}};
+    state.automations.push(a); bus.dispatchEvent(new Event("state"));
+  };
+  renderAutos();
+}
+function renderAutos(){
+  const box=$("#autoList"); if(!box) return;
+  if(!state.automations.length){ box.innerHTML=<div class="muted">Nessuna automazione.</div>; return; }
+  box.innerHTML=""; state.automations.forEach(a=>{
+    const ifDev=state.devices.find(d=>d.id===a.if.deviceId)?.name||"?";
+    const thenDev=state.devices.find(d=>d.id===a.then.deviceId)?.name||"?";
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`<div class="meta"><strong>${a.name}</strong>
+      <span class="muted">SE ${ifDev}.${a.if.prop} ${a.if.op} ${a.if.value} → ALLORA ${a.then.action.toUpperCase()} ${thenDev}</span></div>
+      <div><button class="btn outline" data-del="${a.id}">Elimina</button></div>`;
+    row.querySelector("[data-del]").onclick=()=>{ state.automations=state.automations.filter(x=>x.id!==a.id); bus.dispatchEvent(new Event("state")); };
+    box.appendChild(row);
+  });
+}
+function evalAutomations(triggerDevId){
+  state.automations.forEach(a=>{
+    const dIf = state.devices.find(d=>d.id===a.if.deviceId);
+    const cond = (a.if.op==="=="? (dIf[a.if.prop]===a.if.value):(dIf[a.if.prop]!==a.if.value));
+    if(cond){
+      const dThen = state.devices.find(d=>d.id===a.then.deviceId);
+      if(!dThen) return;
+      if(a.then.action==="on") dThen.on=true; else dThen.on=false;
+    }
+  });
+}
+
+/* ---------- Backup ---------- */
+function viewBackup(v){
+  v.innerHTML = `
+  <section class="card">
+    <h3>Backup & Ripristino</h3>
+    <div class="content">
+      <div class="fld">
+        <button class="btn" id="backupBtn">Scarica backup (.json)</button>
+        <input type="file" id="restoreFile" accept=".json">
+      </div>
+      <p class="hint">Il backup include dispositivi, planimetria (base64) e automazioni. Puoi tenerlo su cloud o inviarlo via mail.</p>
+    </div>
+  </section>`;
+  $("#backupBtn").onclick=()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=SmartHomeHub-backup-${new Date().toISOString().slice(0,10)}.json; a.click();
+  };
+  $("#restoreFile").onchange=(e)=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=()=>{
+      try{ const data=JSON.parse(r.result); Object.assign(state, data); bus.dispatchEvent(new Event("state")); }
+      catch(err){ alert("File non valido"); }
+    }; r.readAsText(f);
+  };
+}
+
+/* ---------- Settings ---------- */
+function viewSettings(v){
+  v.innerHTML = `
+  <div class="grid">
+    <section class="card col-6">
+      <h3>Preferenze</h3>
+      <div class="content">
+        <div class="fld">
+          <label>Tema</label>
+          <select id="themeSel"><option value="dark">Scuro</option><option value="light">Chiaro</option></select>
+        </div>
+        <div class="fld">
+          <button class="btn outline" id="resetBtn">Reset locale</button>
+        </div>
+        <p class="hint">Questo MVP salva i dati in <span class="kbd">localStorage</span>. Per integrazioni reali collegare un backend.</p>
+      </div>
+    </section>
+
+    <section class="card col-6">
+      <h3>Integrazioni (placeholder)</h3>
+      <div class="content">
+        <div class="fld">
+          <input id="haUrl" placeholder="Home Assistant URL (es. http://homeassistant.local:8123)">
+          <input id="haToken" placeholder="Long-Lived Access Token">
+          <button class="btn" id="testHA">Test HA</button>
+        </div>
+        <div class="fld">
+          <input id="alexaKey" placeholder="Alexa API Key (placeholder)">
+          <button class="btn outline" id="testAlexa">Test Alexa (placeholder)</button>
+        </div>
+        <p class="hint">Il browser non può scansionare la rete né controllare Alexa direttamente.
+        Usa un piccolo backend (Node/Python) che esponga API locali e collegalo qui.</p>
+        <pre id="intLog" class="hint" style="white-space:pre-wrap;background:#0b0e13;border:1px solid var(--border);padding:8px;border-radius:8px;max-height:160px;overflow:auto"></pre>
+      </div>
+    </section>
+  </div>`;
+  $("#themeSel").value=state.prefs.theme||"dark";
+  $("#themeSel").onchange=(e)=>{ state.prefs.theme=e.target.value; document.documentElement.dataset.theme=e.target.value; bus.dispatchEvent(new Event("state")); };
+  $("#resetBtn").onclick=()=>{ if(confirm("Cancellare tutti i dati locali?")){ localStorage.removeItem("fabio_hub_v1"); location.reload(); } };
+  $("#testHA").onclick=testHA; $("#testAlexa").onclick=()=>logInt("Alexa: placeholder OK (serve backend ponte).");
+}
+
+async function testHA(){
+  const url=$("#haUrl").value.trim(); const token=$("#haToken").value.trim();
+  if(!url || !token) return logInt("Inserisci URL e Token di Home Assistant.");
+  try{
+    const r=await fetch(url.replace(/\/$/,"")+"/api/", {headers:{Authorization:Bearer ${token}}});
+    logInt("HA /api → HTTP "+r.status+" (se 200 è OK).");
+  }catch(e){ logInt("Errore di rete verso HA: "+e.message); }
+}
+function logInt(s){ const el=$("#intLog"); if(el){ el.textContent+=s+"\n"; el.scrollTop=el.scrollHeight; } }
+
+/* ---------- Wiring ---------- */
+function render(){ renderNav(); r(); }
+render();
+
+/* Ricalcola automazioni quando cambia uno stato */
+const _toggle = toggleDevice;
+toggleDevice = function(id,on){ _toggle(id,on); evalAutomations(id); bus.dispatchEvent(new Event("state")); }
+</script>
+</body>
+</html>
